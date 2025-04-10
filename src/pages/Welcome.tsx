@@ -29,6 +29,7 @@ const InfoCard: React.FC<{
         lineHeight: '22px',
         padding: '16px 19px',
         minWidth: '220px',
+        height: '100%',
         flex: 1,
       }}
     >

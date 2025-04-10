@@ -1,5 +1,5 @@
 import Footer from '@/components/Footer';
-import { getLoginUserUsingGet, queryCurrentUser } from '@/services/backend/userController';
+import { queryCurrentUser } from '@/services/backend/userController';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
@@ -8,10 +8,35 @@ import { requestConfig } from './requestConfig';
 
 const loginPath = '/user/login';
 
+// 从 localStorage 获取持久化的状态
+const getPersistedState = () => {
+  try {
+    const state = localStorage.getItem('initialState');
+    return state ? JSON.parse(state) : undefined;
+  } catch (error) {
+    return undefined;
+  }
+};
+
+// 持久化状态到 localStorage
+const persistState = (state: any) => {
+  try {
+    localStorage.setItem('initialState', JSON.stringify(state));
+  } catch (error) {
+    console.error('Failed to persist state:', error);
+  }
+};
+
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
 export async function getInitialState(): Promise<InitialState> {
+  // 尝试从持久化存储中获取状态
+  const persistedState = getPersistedState();
+  if (persistedState?.currentUser) {
+    return persistedState;
+  }
+
   const initialState: InitialState = {
     currentUser: undefined,
   };
@@ -21,6 +46,8 @@ export async function getInitialState(): Promise<InitialState> {
     try {
       const user = await queryCurrentUser();
       initialState.currentUser = user;
+      // 持久化新的状态
+      persistState(initialState);
     } catch (error: any) {
       // 如果未登录
     }
@@ -30,7 +57,7 @@ export async function getInitialState(): Promise<InitialState> {
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 // @ts-ignore
-export const layout: RunTimeLayoutConfig = ({ initialState }) => {
+export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
     avatarProps: {
       render: () => {
@@ -56,6 +83,18 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     ...defaultSettings,
+    // 添加全局样式
+    style: {
+      height: '100vh',
+      overflow: 'hidden',
+    },
+    // 内容区域样式
+    contentStyle: {
+      height: 'calc(100vh - 56px)', // 减去头部高度
+      overflow: 'auto',
+      padding: '24px',
+      background: '#f0f2f5',
+    },
   };
 };
 

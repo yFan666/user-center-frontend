@@ -35,10 +35,15 @@ const Login: React.FC = () => {
       message.success(defaultLoginSuccessMessage);
 
       // 保存已登录用户信息
-      await setInitialState((s) => ({
-        ...s,
-        currentUser: user,
-      }));
+      await setInitialState((s) => {
+        const newState = {
+          ...s,
+          currentUser: user,
+        };
+        // 持久化状态
+        localStorage.setItem('initialState', JSON.stringify(newState));
+        return newState;
+      });
 
       // 获取重定向地址
       const urlParams = new URL(window.location.href).searchParams;
