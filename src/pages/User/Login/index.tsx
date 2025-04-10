@@ -27,21 +27,28 @@ const Login: React.FC = () => {
   const handleSubmit = async (values: API.UserLoginRequest) => {
     try {
       // 登录
-      const user = await userLogin({
+      const user = (await userLogin({
         ...values,
-      });
-
-      console.log('user: ', user);
+      })) as API.CurrentUser;
 
       const defaultLoginSuccessMessage = '登录成功！';
       message.success(defaultLoginSuccessMessage);
+
       // 保存已登录用户信息
-      setInitialState({
-        ...initialState,
-        currentUser: user.data,
-      });
+      await setInitialState((s) => ({
+        ...s,
+        currentUser: user,
+      }));
+
+      // 获取重定向地址
       const urlParams = new URL(window.location.href).searchParams;
-      history.push(urlParams.get('redirect') || '/');
+      const redirect = urlParams.get('redirect') || '/welcome';
+
+      // 使用setTimeout确保状态更新完成后再跳转
+      setTimeout(() => {
+        history.push(redirect);
+      }, 0);
+
       return;
     } catch (error: any) {
       const defaultLoginFailureMessage = `登录失败，${error.message}`;

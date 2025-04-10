@@ -12,10 +12,11 @@ export default [
     path: '/admin',
     icon: 'crown',
     name: '管理页',
-    access: 'canAdmin',
+    access: 'canAdmin', // 权限
     routes: [
       { path: '/admin', redirect: '/admin/user' },
-      { icon: 'table', path: '/admin/user', component: './Admin/User', name: '用户管理' },
+      { icon: 'table', path: '/admin/user', component: './Admin/User', name: '用户管理 copy' },
+      { path: '/admin/user-manage', name: '用户管理', component: './Admin/UserManage' },
     ],
   },
   { path: '/', redirect: '/welcome' },

@@ -1,4 +1,18 @@
 declare namespace API {
+  type CurrentUser = {
+    id: number;
+    username: string;
+    userAccount: string;
+    avatarUrl: string;
+    gender: number;
+    phone: string;
+    email: string;
+    userStatus: number;
+    userRole: number;
+    createTime: Date;
+    updateTime: Date;
+  };
+
   type BaseResponseBoolean_ = {
     code?: number;
     data?: boolean;

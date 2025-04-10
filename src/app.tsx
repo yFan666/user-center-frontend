@@ -1,5 +1,5 @@
 import Footer from '@/components/Footer';
-import { getLoginUserUsingGet } from '@/services/backend/userController';
+import { getLoginUserUsingGet, queryCurrentUser } from '@/services/backend/userController';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
@@ -19,8 +19,8 @@ export async function getInitialState(): Promise<InitialState> {
   const { location } = history;
   if (location.pathname !== loginPath) {
     try {
-      const res = await getLoginUserUsingGet();
-      initialState.currentUser = res.data;
+      const user = await queryCurrentUser();
+      initialState.currentUser = user;
     } catch (error: any) {
       // 如果未登录
     }
@@ -37,17 +37,17 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
         return <AvatarDropdown />;
       },
     },
+
     waterMarkProps: {
-      content: initialState?.currentUser?.userName,
+      content: initialState?.currentUser?.username,
     },
     footerRender: () => <Footer />,
     onPageChange: (location: Location) => {
-      console.log('location: ', location);
-
-      const whileList = ['/user/register', loginPath];
-      if (whileList.includes(location.pathname)) {
+      const whiteList = ['/user/login', '/user/register'];
+      if (whiteList.includes(location.pathname)) {
         return;
       }
+      // 如果用户未登录且不在白名单中，重定向到登录页
       if (!initialState?.currentUser) {
         history.push(loginPath);
       }

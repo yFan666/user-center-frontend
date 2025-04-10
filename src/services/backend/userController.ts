@@ -44,6 +44,13 @@ export async function getUserByIdUsingGet(
   });
 }
 
+export async function queryCurrentUser(options?: { [key: string]: any }) {
+  return request<API.CurrentUser>('/api/user/current', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
 /** getLoginUser GET /api/user/get/login */
 export async function getLoginUserUsingGet(options?: { [key: string]: any }) {
   return request<API.BaseResponseLoginUserVO_>('/api/user/get/login', {
